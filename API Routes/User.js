@@ -37,28 +37,26 @@ router.post('/register', async (req, res) => {
 
 //POST login
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    //find by email
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid email' });
+    const { email, password } = req.body;
+  
+    try {
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({ message: 'Invalid email!' });
+      }
+  
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Invalid password!' });
+      }
+  
+      // Generate token with a secret key ('your_secret_key') and expiresIn option
+      const token = jwt.sign({ userId: user._id }, 'your_secret_key', { expiresIn: '1d' });
+  
+      res.json({ token });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
-
-    //match password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid password' });
-    }
-
-    //give token for authentication
-    const token = jwt.sign({ userId: user._id }, 'token', { expiresIn: '1h' });
-
-    res.json({ token });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+  });
 
 module.exports = router;

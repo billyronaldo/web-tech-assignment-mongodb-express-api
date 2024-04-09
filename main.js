@@ -8,6 +8,7 @@ const productRoutes = require('./API Routes/Product');
 const userRoutes = require('./API Routes/User');
 const commentRoutes = require('./API Routes/Comment');
 const cartRoutes = require('./API Routes/Cart');
+const orderRoutes = require('./API Routes/Order');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -22,7 +23,8 @@ app.use(productRoutes);
 app.use(userRoutes);
 app.use(commentRoutes);
 app.use(cartRoutes);
+app.use(orderRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server port ${PORT}`);
 })

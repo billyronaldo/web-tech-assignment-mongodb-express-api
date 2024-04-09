@@ -1,5 +1,6 @@
 const express = require('express');
 const Product = require('../Models/Product');
+const authToken = require('../authToken');
 
 const router = express.Router(); 
 //GET Products
