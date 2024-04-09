@@ -33,8 +33,8 @@ const router = express.Router();
 
   //Delete Products
   router.delete('/products/:id', (req, res) => {
-      Member.findByIdAndDelete(req.params.id)
-        .then(() => res.json('Product deleted.'))
+      Product.findByIdAndDelete(req.params.id)
+        .then(() => res.json({message: "product deleted"}))
         .catch((err) => res.status(400).json('Error: ' + err));
     });
 

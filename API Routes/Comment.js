@@ -24,7 +24,7 @@ router.post('/comments', async (req, res) => {
     const user = await User.findById(userId);
 
     if (!product || !user) {
-      return res.status(404).json({ message: 'Product or user not found' });
+      return res.status(404).json({ message: 'no product or user' });
     }
 
     // Create a new Comment object
@@ -52,10 +52,10 @@ router.delete('/comments/:id', async (req, res) => {
     const deletedComment = await Comments.findByIdAndDelete(id);
 
     if (!deletedComment) {
-      return res.status(404).json({ message: 'Comment not found' });
+      return res.status(404).json({ message: 'no comment found' });
     }
 
-    res.json({ message: 'Comment deleted successfully' });
+    res.json({ message: 'comment deleted ' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
