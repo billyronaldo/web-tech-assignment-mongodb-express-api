@@ -37,6 +37,32 @@ const router = express.Router();
         .then(() => res.json('Product deleted.'))
         .catch((err) => res.status(400).json('Error: ' + err));
     });
+
+    // PUT update product
+router.put('/products/:id', async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      const updatedProduct = await Product.findByIdAndUpdate(
+        id,
+        {
+          description: req.body.description,
+          image: req.body.image,
+          pricing: req.body.pricing,
+          shippingCost: req.body.shippingCost,
+        },
+        { new: true }
+      );
+  
+      if (!updatedProduct) {
+        return res.status(404).json({ message: 'Product not found' });
+      }
+  
+      res.json(updatedProduct);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
   
     module.exports = router;
 

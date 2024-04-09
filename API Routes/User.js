@@ -59,4 +59,26 @@ router.post('/login', async (req, res) => {
     }
   });
 
+  // PUT edit user details
+router.put('/users/:id', async (req, res) => {
+    const { id } = req.params;
+    const { email, username, shippingAddress } = req.body;
+  
+    try {
+      const updatedUser = await User.findByIdAndUpdate(
+        id,
+        { email, username, shippingAddress },
+        { new: true }
+      );
+  
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      res.json(updatedUser);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+
 module.exports = router;
