@@ -2,6 +2,7 @@ const express = require('express');
 const Product = require('../Models/Product');
 
 const router = express.Router(); 
+//GET Products
  router.get('/products', async (req, res) => {
     try {
       const products = await Product.find();
@@ -11,7 +12,9 @@ const router = express.Router();
     }
   });
   
+//POST Proudcts
   router.post('/products', async (req, res) => {
+    //new product object
     const product = new Product({
         description: req.body.description,
         image: req.body.image,
@@ -26,7 +29,8 @@ const router = express.Router();
       res.status(400).json({ message: err.message });
     }
   });
-  
+
+  //Delete Products
   router.delete('/products/:id', (req, res) => {
       Member.findByIdAndDelete(req.params.id)
         .then(() => res.json('Product deleted.'))
