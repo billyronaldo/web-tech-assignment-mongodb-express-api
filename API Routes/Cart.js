@@ -59,21 +59,57 @@ router.delete('/cart/remove/:userId/:productId', async (req, res) => {
   const { userId, productId } = req.params;
 
   try {
-    // Find and update the user's cart
-    const cart = await Cart.findOneAndUpdate(
-      { user: userId },
-      { $pull: { products: productId } },
-      { new: true }
-    );
-
+    const cart = await Cart.findOne({ user: userId });
     if (!cart) {
       return res.status(404).json({ message: 'Cart not found' });
     }
+
+    // Find the index of the product to remove
+    const indexToRemove = cart.products.findIndex(product => product._id.toString() === productId);
+
+    if (indexToRemove === -1) {
+      return res.status(404).json({ message: 'Product not found in cart' });
+    }
+
+    // Remove the product from products and quantities arrays
+    cart.products.splice(indexToRemove, 1);
+    cart.quantities.splice(indexToRemove, 1);
+
+    await cart.save();
 
     res.json(cart);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+
+router.put('/cart/updateQuantity', async (req, res) => {
+  const { productId, userId, newQuantity } = req.body;
+
+  try {
+    // Find the user's cart
+    const cart = await Cart.findOne({ user: userId });
+
+    if (!cart) {
+      return res.status(404).json({ message: 'Cart not found' });
+    }
+
+    // Convert ObjectId instances to strings for comparison
+    const productIds = cart.products.map(product => product.toString());
+
+    // Update the quantity for the given productId
+    const index = productIds.findIndex(id => id === productId);
+    if (index !== -1) {
+      cart.quantities[index] = newQuantity;
+      await cart.save();
+      res.json(cart);
+    } else {
+      return res.status(404).json({ message: 'Product not found in cart' });
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 
 module.exports = router;

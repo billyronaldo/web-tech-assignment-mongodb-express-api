@@ -2,43 +2,39 @@ const express = require('express');
 const Order = require('../Models/Order');
 const Product = require('../Models/Product');
 const User = require('../Models/User');
+const Cart = require('../Models/Cart');
 const requireAuth = require('../authToken');
 
 const router = express.Router();
 
 // POST create a new order
 router.post('/orders', async (req, res) => {
-  const { userId, products, quantities, totalPrice } = req.body;
+  const { userId, products, quantities } = req.body;
 
   try {
-    // Check if products and quantities are arrays and have the same length
     if (!Array.isArray(products) || !Array.isArray(quantities) || products.length !== quantities.length) {
       return res.status(400).json({ message: 'Invalid products or quantities' });
     }
 
-    // Find the user
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Check if all products exist and calculate total price
     let total = 0;
     const productsExist = await Promise.all(products.map(async (productId, index) => {
       const product = await Product.findById(productId);
       if (!product) {
-        return false; // Product not found
+        return false;
       }
-      total += product.price * quantities[index];
-      return true; // Product found
+      total += product.pricing * quantities[index];
+      return true;
     }));
 
-    // If any product is not found, return error
     if (productsExist.includes(false)) {
-      return res.status(404).json({ message: 'One or more products not found' });
+      return res.status(404).json({ message: 'Some products not found' });
     }
 
-    // Create the order
     const order = new Order({
       user: userId,
       products,
@@ -46,8 +42,10 @@ router.post('/orders', async (req, res) => {
       totalPrice: total,
     });
 
-    // Save the order to the database
     const newOrder = await order.save();
+
+    // Delete the cart after placing the order
+    await Cart.deleteOne({ user: userId });
 
     res.status(201).json(newOrder);
   } catch (err) {

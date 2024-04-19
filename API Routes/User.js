@@ -49,9 +49,8 @@ router.post('/login', async (req, res) => {
       if (!isMatch) {
         return res.status(400).json({ message: 'Invalid password!' });
       }
-  
-      // Generate token with a secret key ('your_secret_key') and expiresIn option
-      const token = jwt.sign({ userId: user._id }, 'your_secret_key', { expiresIn: '1d' });
+
+      const token = jwt.sign({ userId: user._id }, 'key', { expiresIn: '1d' });
   
       res.json({ token });
     } catch (error) {

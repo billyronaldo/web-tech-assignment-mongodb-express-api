@@ -17,6 +17,7 @@ const router = express.Router();
   router.post('/products', async (req, res) => {
     //new product object
     const product = new Product({
+        name: req.body.name,
         description: req.body.description,
         image: req.body.image,
         pricing: req.body.pricing,
@@ -63,6 +64,21 @@ router.put('/products/:id', async (req, res) => {
       res.status(500).json({ message: err.message });
     }
   });
+
+  // GET product details by ID
+router.get('/products/:productId', async (req, res) => {
+  const { productId } = req.params;
+
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    res.json(product);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
   
     module.exports = router;
 
